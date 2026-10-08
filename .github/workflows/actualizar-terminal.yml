@@ -1,9 +1,9 @@
 name: Actualizar Terminal Planetaria
 
 on:
-  workflow_dispatch: # Te permite ejecutarlo manualmente desde la pestaña Actions
+  workflow_dispatch: # Permite ejecución manual
   schedule:
-    - cron: '0 20 * * 1-5' # Opcional: Se ejecuta automáticamente de lunes a viernes a las 20:00 UTC
+    - cron: '0 20 * * 1-5' # De lunes a viernes a las 20:00 UTC
 
 jobs:
   build:
@@ -11,10 +11,10 @@ jobs:
 
     steps:
     - name: Descargar el repositorio
-      uses: actions/checkout@v4
+      uses: actions/checkout@v4.2.2 # Versión actualizada para Node 24
 
     - name: Configurar Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v5.4.0 # Versión actualizada para Node 24
       with:
         python-version: '3.10'
 
@@ -28,7 +28,7 @@ jobs:
         python terminal_planetaria.py
 
     - name: Subir el HTML generado como artefacto
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v4.6.1 # Versión actualizada para Node 24
       with:
         name: terminal-html
         path: terminal_planetaria.html
