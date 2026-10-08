@@ -11,7 +11,7 @@ permissions:
   pages: write
   id-token: write
 
-# Evita que se acumulen ejecuciones simultáneas si activas la pipeline muchas veces seguidas
+# Evita que se acumulen ejecuciones simultáneas
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -20,7 +20,7 @@ jobs:
   build-and-deploy:
     environment:
       name: github-pages
-      url: ${{ steps: deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
 
     steps:
@@ -46,7 +46,7 @@ jobs:
 
     - name: Preparar archivo para subir
       run: |
-        # GitHub Pages necesita una carpeta para subir. Creamos 'dist' y movemos el HTML renombrándolo a index.html
+        # Creamos 'dist' y movemos el HTML renombrándolo a index.html
         mkdir dist
         mv terminal_planetaria.html dist/index.html
 
