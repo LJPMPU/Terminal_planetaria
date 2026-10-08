@@ -1,20 +1,34 @@
 name: Actualizar Terminal Planetaria
 
 on:
-  workflow_dispatch: # Permite ejecución manual
+  workflow_dispatch: # Permite ejecución manual desde la pestaña Actions
   schedule:
     - cron: '0 20 * * 1-5' # De lunes a viernes a las 20:00 UTC
 
+# Permisos necesarios para que GitHub Actions pueda publicar en GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Evita que se acumulen ejecuciones simultáneas si activas la pipeline muchas veces seguidas
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
-  build:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps: deployment.outputs.page_url }}
     runs-on: ubuntu-latest
 
     steps:
     - name: Descargar el repositorio
-      uses: actions/checkout@v4.2.2 # Versión actualizada para Node 24
+      uses: actions/checkout@v4.2.2
 
     - name: Configurar Python
-      uses: actions/setup-python@v5.4.0 # Versión actualizada para Node 24
+      uses: actions/setup-python@v5.4.0
       with:
         python-version: '3.10'
 
@@ -27,8 +41,20 @@ jobs:
       run: |
         python terminal_planetaria.py
 
-    - name: Subir el HTML generado como artefacto
-      uses: actions/upload-artifact@v4.6.1 # Versión actualizada para Node 24
+    - name: Configurar entorno de GitHub Pages
+      uses: actions/configure-pages@v5
+
+    - name: Preparar archivo para subir
+      run: |
+        # GitHub Pages necesita una carpeta para subir. Creamos 'dist' y movemos el HTML renombrándolo a index.html
+        mkdir dist
+        mv terminal_planetaria.html dist/index.html
+
+    - name: Subir contenido a GitHub Pages
+      uses: actions/upload-pages-artifact@v3
       with:
-        name: terminal-html
-        path: terminal_planetaria.html
+        path: './dist'
+
+    - name: Desplegar en GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
